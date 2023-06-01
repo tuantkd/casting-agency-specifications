@@ -7,6 +7,10 @@ from models import *
 from flask_cors import CORS, cross_origin
 from flask import Flask, request, abort, jsonify, make_response
 from datetime import date, datetime
+from flask import Flask, request, jsonify, abort
+import json
+import ssl
+from .auth.auth import AuthError, requires_auth
 PER_PAGE = 10
 
 def create_app(test_config=None):
@@ -14,6 +18,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
     setup_db(app)
     CORS(app)
+    ssl._create_default_https_context = ssl._create_stdlib_context
 
     @app.route('/')
     def welcome_app(): 
@@ -49,6 +54,7 @@ def create_app(test_config=None):
             }), 400
 
     @app.route('/get-categories')
+    @requires_auth('get:drinks-detail')
     def get_categories():
         try:
             page = request.args.get('page', 1, type=int)
@@ -208,6 +214,43 @@ def create_app(test_config=None):
                 "messages": err.messages,
                 "validate": validate_require
             }), 400
+    
+    
+    # Error Handling
+    @app.errorhandler(AuthError)
+    def handle_auth_error(ex):
+        response = jsonify({
+            "error": ex.error,
+            "status_code": ex.status_code,
+            "message": ex.message
+        })
+        response.status_code = ex.status_code
+        return response
+
+
+    @app.errorhandler(404)
+    def resource_not_found_error_handler(error):
+        return jsonify({
+            'success': False,
+            'message': 'Auth error'
+        }), 401
+
+
+    @app.errorhandler(404)
+    def resource_not_found_error_handler(error):
+        return jsonify({
+            'success': False,
+            'message': 'resource not found'
+        }), 404
+
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+            "success": False,
+            "error": 422,
+            "message": "unprocessable"
+        }), 422
     
     return app
 
