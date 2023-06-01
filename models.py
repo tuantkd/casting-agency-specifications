@@ -29,12 +29,13 @@ def setup_db(app, database_path=database_path):
 Categories with attributes id and title
 '''
 class Categories(db.Model):  
-  __tablename__ = 'Categories'
+  __tablename__ = 'categories'
 
   id = Column(db.Integer, primary_key=True)
   title = Column(String)
 
-  def __init__(self, title):
+  def __init__(self, id, title):
+    self.id = id
     self.title = title
     
   def insert(self):
@@ -59,18 +60,20 @@ class Categories(db.Model):
 Products with attributes id and name, price, quantity
 '''
 class Products(db.Model):  
-  __tablename__ = 'Products'
+  __tablename__ = 'products'
 
   id = Column(db.Integer, primary_key=True)
-  category_id = Column(Integer, ForeignKey(Categories.id), primary_key=True)
+  category_id = Column(Integer, ForeignKey(Categories.id))
   name = Column(String)
   price = Column(Integer)
   quantity = Column(Integer)
   
   categories = relationship('Categories', foreign_keys='Products.category_id')
 
-  def __init__(self, title, price, quantity):
-    self.title = title
+  def __init__(self, id, category_id, name, price, quantity):
+    self.id = id
+    self.category_id = category_id
+    self.name = name
     self.price = price
     self.quantity = quantity
     
@@ -88,7 +91,8 @@ class Products(db.Model):
   def format(self):
     return {
       'id': self.id,
-      'title': self.title,
+      'category_id': self.category_id,
+      'name': self.name,
       'price': self.price,
       'quantity': self.quantity,
     }
