@@ -1,16 +1,2 @@
-.vscode
+.idea
 __pycache__
-venv
-
-# OS generated files #
-######################
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-env/
-migrations/
-frontend/node_modules/

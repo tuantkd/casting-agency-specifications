@@ -1,0 +1,1 @@
+web: gunicorn casting-agency-specifications.wsgi:application
