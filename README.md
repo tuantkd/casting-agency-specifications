@@ -491,8 +491,4 @@ python test.py
 ```
 
 Alternate way: Create the db `capstone_test` using PgAdmin and copy the contents of casting.sql and paste them
-in Query tool in PgAdmin and create the db table with records. Then, run the command `python test.py`.# CodeNinjas-Agency
-
-# CodeNinjas-Agency
-
-# chaudn-project-final
+in Query tool in PgAdmin and create the db table with records. Then, run the command `python test.py`.
