@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import date
 from dotenv import load_dotenv
 from flask_migrate import Migrate
@@ -18,13 +19,28 @@ database_path = os.environ.get('DATABASE_URL')
 db = SQLAlchemy()
 
 # ----------------------------------------------------------------------------#
+'''
+Extend the base Model class to add common methods
+'''
+class inheritedClassName(db.Model):
+    __abstract__ = True
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+        
 
 def setup_db(app):
     """binds a flask application and a SQLAlchemy service"""
     app.config["SQLALCHEMY_DATABASE_URI"] = database_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = SQLALCHEMY_TRACK_MODIFICATIONS
-    # postgresql://postgres_deployment_example_u65m_user:c9uJmtgQVhSz6tlHdMHTd8vdGW69wuUO@dpg-chitteu4dad01ah3t3u0-a.singapore-postgres.render.com/postgres_deployment_example_u65m
     migrate = Migrate(app, db)
     db.app = app
     db.init_app(app)
@@ -37,9 +53,13 @@ def db_drop_and_create_all():
     """
     db.drop_all()
     db.create_all()
+    
 
-
-class ActorInMovie(db.Model):
+'''
+ActorInMovie
+'''
+@dataclass
+class ActorInMovie(inheritedClassName):
     __tablename__ = "actor_in_movie"
 
     movie_id = Column(Integer, ForeignKey("movies.id"), primary_key=True)
@@ -48,17 +68,6 @@ class ActorInMovie(db.Model):
     def __init__(self, movie_id: int, actor_id: int):
         self.movie_id = movie_id
         self.actor_id = actor_id
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
 
     @property
     def short_info(self):
@@ -86,7 +95,11 @@ class ActorInMovie(db.Model):
             self.movie_id, self.actor_id)
 
 
-class Movie(db.Model):
+'''
+Movie
+'''
+@dataclass
+class Movie(inheritedClassName):
     __tablename__ = "movies"
 
     id = Column(Integer, primary_key=True)
@@ -102,17 +115,6 @@ class Movie(db.Model):
         self.release_year = release_year
         self.duration = duration
         self.imdb_rating = imdb_rating
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
 
     @property
     def short_info(self):
@@ -146,7 +148,11 @@ class Movie(db.Model):
             self.title, self.release_year, self.imdb_rating, self.duration)
 
 
-class Actor(db.Model):
+'''
+Actor
+'''
+@dataclass
+class Actor(inheritedClassName):
     __tablename__ = "actors"
 
     id = Column(Integer, primary_key=True)
@@ -160,17 +166,6 @@ class Actor(db.Model):
         self.name = name
         self.full_name = full_name
         self.date_of_birth = date_of_birth
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
 
     @property
     def short_info(self):

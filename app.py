@@ -1,16 +1,28 @@
-from flask import Flask, request, abort, jsonify
+from flask import (
+  Flask,
+  request,
+  abort,
+  jsonify
+)
+from database.models import (
+    ActorInMovie,
+    setup_db,
+    Actor,
+    Movie
+)
+import sys
+from auth.auth import AuthError, requires_auth
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from database.models import ActorInMovie, db_drop_and_create_all, setup_db, Actor, Movie
-from auth.auth import AuthError, requires_auth
-
+from flask import Blueprint
+agency_blueprint = Blueprint('agency_blueprint', __name__)
 
 def create_app():
     app = Flask(__name__)
     setup_db(app)
 
     CORS(app, resources={r"/*": {"origins": "*"}})
-    # ssl._create_default_https_context = ssl._create_stdlib_context
+    #ssl._create_default_https_context = ssl._create_stdlib_context
 
     @app.after_request
     def after_request(response):
@@ -20,11 +32,11 @@ def create_app():
                              'GET, POST, PATCH, DELETE, OPTIONS')
         return response
 
-    @app.route('/')
-    def health():
+    @agency_blueprint.route('/')
+    def home():
         return "Casting Agency Specifications", 200
 
-    @app.route('/actors')
+    @agency_blueprint.route('/actors')
     @requires_auth("get:actors")
     def get_actors(payload):
         actors_query = Actor.query.order_by(Actor.id).all()
@@ -35,7 +47,7 @@ def create_app():
             "actors": actors
         }), 200
 
-    @app.route('/actors/<int:actor_id>')
+    @agency_blueprint.route('/actors/<int:actor_id>')
     @requires_auth("get:actors-info")
     def get_actor_by_id(payload, actor_id):
         actor = Actor.query.get_or_404(actor_id)
@@ -45,7 +57,7 @@ def create_app():
             "actor": actor.full_info
         }), 200
 
-    @app.route('/actors', methods=['POST'])
+    @agency_blueprint.route('/actors', methods=['POST'])
     @requires_auth("post:actor")
     def create_actor(payload):
         try:
@@ -75,9 +87,10 @@ def create_app():
             abort(422)
 
         except Exception:
+            print(sys.exc_info())
             abort(500)
 
-    @app.route('/actors/<int:actor_id>', methods=['PATCH'])
+    @agency_blueprint.route('/actors/<int:actor_id>', methods=['PATCH'])
     @requires_auth("patch:actor")
     def update_actor(payload, actor_id):
         actor = Actor.query.get_or_404(actor_id)
@@ -116,9 +129,10 @@ def create_app():
             abort(422)
 
         except Exception:
+            print(sys.exc_info())
             abort(500)
 
-    @app.route('/actors/<int:actor_id>', methods=['DELETE'])
+    @agency_blueprint.route('/actors/<int:actor_id>', methods=['DELETE'])
     @requires_auth("delete:actor")
     def delete_actor(payload, actor_id):
         actor = Actor.query.get_or_404(actor_id)
@@ -132,9 +146,10 @@ def create_app():
             }), 200
 
         except Exception:
+            print(sys.exc_info())
             abort(500)
 
-    @app.route('/movies')
+    @agency_blueprint.route('/movies')
     @requires_auth("get:movies")
     def get_movies(payload):
         movies_query = Movie.query.order_by(Movie.id).all()
@@ -145,7 +160,7 @@ def create_app():
             "movies": movies
         }), 200
 
-    @app.route('/movies/<int:movie_id>')
+    @agency_blueprint.route('/movies/<int:movie_id>')
     @requires_auth("get:movies-info")
     def get_movie_by_id(payload, movie_id):
         movie = Movie.query.get_or_404(movie_id)
@@ -155,7 +170,7 @@ def create_app():
             "movie": movie.full_info
         }), 200
 
-    @app.route('/movies', methods=['POST'])
+    @agency_blueprint.route('/movies', methods=['POST'])
     @requires_auth("post:movie")
     def create_movie(payload):
         try:
@@ -202,9 +217,10 @@ def create_app():
             abort(422)
 
         except Exception as ess:
+            print(sys.exc_info())
             abort(500)
 
-    @app.route('/movies/<int:movie_id>', methods=['PATCH'])
+    @agency_blueprint.route('/movies/<int:movie_id>', methods=['PATCH'])
     @requires_auth("patch:movie")
     def update_movie(payload, movie_id):
         movie = Movie.query.get_or_404(movie_id)
@@ -262,9 +278,10 @@ def create_app():
             abort(422)
 
         except Exception:
+            print(sys.exc_info())
             abort(500)
 
-    @app.route('/movies/<int:movie_id>', methods=['DELETE'])
+    @agency_blueprint.route('/movies/<int:movie_id>', methods=['DELETE'])
     @requires_auth("delete:movie")
     def delete_movie(payload, movie_id):
         movie = Movie.query.get_or_404(movie_id)
@@ -278,6 +295,7 @@ def create_app():
             }), 200
 
         except Exception:
+            print(sys.exc_info())
             abort(500)
 
     @app.errorhandler(AuthError)
@@ -307,3 +325,4 @@ def create_app():
 
 
 app = create_app()
+app.register_blueprint(agency_blueprint)

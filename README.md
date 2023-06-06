@@ -1,5 +1,7 @@
 # Casting Agency API
-
+I am in this specific industry where such a tool will help the people do their job efficiently
+I developed this project to make use of the knowledge you acquired in this nanodegree and hence gain confidence in these skills.
+I wanted to contribute something to the open-source community by building this tool.
 ## Capstone Project for Udacity's Full Stack Developer Nanodegree
 
 Render Link: https://render-deployment-example-o0wa.onrender.com
@@ -23,7 +25,7 @@ Recommend working within a virtual environment whenever using Python for project
 Once you have your virtual environment setup and running, install dependencies by running:
 
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 This will install all of the required packages.
@@ -54,7 +56,10 @@ To run the server, execute:
 
 ```bash
 export DATABASE_URL=<database-connection-url>
+#On Linux : export
 export FLASK_APP=app.py
+#On Windows : set
+set FLASK_APP=app.py
 flask run --reload
 ```
 

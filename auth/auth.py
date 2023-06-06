@@ -11,9 +11,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-AUTH0_DOMAIN = 'dev-llbe44jtv6ek8v88.us.auth0.com'
-ALGORITHMS = ['RS256']
-API_AUDIENCE = 'entertainment'
+AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN')
+ALGORITHMS = os.environ.get['ALGORITHMS']
+API_AUDIENCE = os.environ.get('API_AUDIENCE')
 
 
 class AuthError(Exception):
